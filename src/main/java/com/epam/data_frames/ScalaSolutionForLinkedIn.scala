@@ -1,5 +1,6 @@
 package com.epam.data_frames
 
+import com.epam.Person
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.functions._
@@ -17,6 +18,8 @@ object ScalaSolutionForLinkedIn {
     val spark = new SQLContext(sc)
     val dataFrame = spark.read.json("data/linkedIn/*")
     dataFrame.schema.fields.foreach(println(_))
+
+
 
     val salaryDf = dataFrame
       .withColumn("salary", col("age") * 10 * size(col("keywords")))

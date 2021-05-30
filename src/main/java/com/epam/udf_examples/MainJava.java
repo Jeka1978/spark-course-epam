@@ -4,12 +4,13 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
-import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.functions;
 import org.apache.spark.sql.types.DataTypes;
 
-import static org.apache.spark.sql.functions.*;
+import static org.apache.spark.sql.functions.callUDF;
+import static org.apache.spark.sql.functions.col;
 
 /**
  * @author Evgeny Borisov
@@ -24,7 +25,7 @@ public class MainJava {
         SparkContext sc = new SparkContext(sparkConf);
         SQLContext spark = new SQLContext(sc);
 
-        DataFrame dataFrame = spark.read().json("data/linkedIn/*");
+        Dataset<Row> dataFrame = spark.read().json("data/linkedIn/*");
 
         spark.udf().register(CalcNicknameUdf.class.getName(),new CalcNicknameUdf(), DataTypes.StringType);
 

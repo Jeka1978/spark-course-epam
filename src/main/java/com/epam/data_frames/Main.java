@@ -4,9 +4,10 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
-import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 
@@ -28,12 +29,14 @@ public class Main {
         Logger.getLogger("akka").setLevel(Level.OFF);
 
 
-        SparkConf sparkConf = new SparkConf().setAppName("linkedIn").setMaster("local[*]");
-        SparkContext sc = new SparkContext(sparkConf);
-        SQLContext spark = new SQLContext(sc);
+        SparkSession spark = SparkSession.builder().appName("abc").master("local[*]").getOrCreate();
 
-        DataFrame dataFrame = spark.read().json("data/linkedIn/*");
+
+
+
+        Dataset<Row> dataFrame = spark.read().json("data/linkedIn/*");
         dataFrame.show();
+
 
         dataFrame.printSchema();
 
@@ -60,7 +63,7 @@ public class Main {
         dataFrame.where(col("age").$greater(40)).show();
 
 
-        DataFrame salaryDf = dataFrame.withColumn(SALARY, col("age").multiply(10).multiply(size(col(KEYWORDS))));
+        Dataset<Row> salaryDf = dataFrame.withColumn(SALARY, col("age").multiply(10).multiply(size(col(KEYWORDS))));
 //        salaryDf.persist();
         salaryDf.show();
 
@@ -82,14 +85,14 @@ public class Main {
         salaryDf.registerTempTable("employees");
 
         String sqlText = "select * from employees where salary < 1200";
-        DataFrame dataFrame1 = spark.sql(sqlText);
+        Dataset<Row> dataFrame1 = spark.sql(sqlText);
 
         salaryDf=null;
         printSomething(spark);
 
     }
 
-    private static void printSomething(SQLContext spark) {
+    private static void printSomething(SparkSession spark) {
         spark.sql("select * from employees where salary < 1200").show();
     }
 }
